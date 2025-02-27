@@ -30,3 +30,13 @@ jobs:
         with:
           name: test-results
           path: results
+
+      - name: Run your tests
+        run: pytest
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-traces_and_results
+          path: |
+            allure_results/
+            *trace.zip
