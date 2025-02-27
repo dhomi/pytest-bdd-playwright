@@ -1,7 +1,8 @@
 Feature: Notification API
-  Deze call maakt voor het Business Portal scenario
-  een 'standaard' klant aan.
+  Deze call maakt een 'standaard' klant aan
+  voor het Business Portal scenario
 
+  @maak_klant_aan
   Scenario: Maak een standaard klant aan voor het Business Portal
     Given the Notification API endpoint is set
     And the request headers are set
