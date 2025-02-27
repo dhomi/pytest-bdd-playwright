@@ -47,7 +47,8 @@ jobs:
       - name: Run all tests
         if: ${{ github.event.inputs.test_suite == 'all' || github.event.inputs.test_suite == '' }}
         run: |
-          pytest tests/features --alluredir=allure-results
+          # pytest tests/features --alluredir=allure-results
+           pytest
         continue-on-error: true
 
       - name: Run service tests
