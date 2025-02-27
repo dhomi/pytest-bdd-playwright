@@ -66,7 +66,7 @@ jobs:
             unzip -t artifacts.zip || echo "Invalid zip file"
             unzip artifacts.zip -d allure_results || echo "Failed to unzip"
           fi
-      - run: mkdir allure_results && unzip artifacts.zip -d allure_results
+      - run: mkdir -p allure_results && unzip artifacts.zip -d allure_results
       - run: mkdir old_pages pages_history && unzip pages.zip -d old_pages && tar -xvf old_pages/artifact.tar -C pages_history
       - run: cp pages_history/history/* allure_results && cp -r pages_history/history allure_results
       - name: Store allure history
