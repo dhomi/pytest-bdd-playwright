@@ -4,9 +4,6 @@ Feature: Delete Notification API
 
   @verwijder_klant
   Scenario: Send SOAP request to delete a notification
-    Given the Notification API endpoint is set
-    And the request headers are set
-    And the SOAP delete request body is prepared
-    When I send the SOAP delete request
-    Then the response status code should be 200
-    And the response should contain a valid SOAP response
+    Given I have the necessary headers and body for the delete API request
+    When I send the delete request to the API
+    Then I should receive a valid response with status code 200
