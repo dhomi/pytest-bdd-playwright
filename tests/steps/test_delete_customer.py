@@ -2,11 +2,11 @@ import requests
 from pytest_bdd import scenarios, given, when, then
 
 # Path to the feature file
-scenarios('../features/notification_api.feature')
+scenarios('../features/delete_customer.feature')
 
 
 # Given step: Set up the necessary headers and body
-@given('I have the necessary headers and body for the API request', target_fixture="setup_request")
+@given('I have the necessary headers and body for the delete API request', target_fixture="setup_request")
 def setup_request():
     headers = {
         'Content-Type': 'application/xml',
@@ -32,7 +32,7 @@ def setup_request():
 
 
 # When step: Send the request to the API
-@when('I send the request to the API', target_fixture="send_request")
+@when('I send the delete request to the API', target_fixture="send_request")
 def send_request(setup_request):
     url = setup_request['url']
     headers = setup_request['headers']
