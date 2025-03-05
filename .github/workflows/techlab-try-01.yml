@@ -22,7 +22,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          ref: main
+          ref: gh-pages
           path: gh-pages
 
       - name: Build test report
