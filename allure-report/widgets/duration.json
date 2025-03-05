@@ -1,0 +1,1 @@
+[{"uid":"414e309249d26e2b","name":"Send SOAP request to delete a notification","time":{"start":1741184900705,"stop":1741184901041,"duration":336},"status":"passed","severity":"normal"},{"uid":"9cedb744db535326","name":"Create a standard customer for the Business Portal","time":{"start":1741184900129,"stop":1741184900702,"duration":573},"status":"passed","severity":"normal"}]
