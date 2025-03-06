@@ -18,7 +18,7 @@ jobs:
         run: mkdir -p allure-results/history
 
       - name: Copy history
-        run: cp -R ./.github/gh-pages/last-history/* allure-results/history/
+        run: cp -R ./.github/allure-report/last-history/* allure-results/history/
 
       ## Deploy step
       - name: Deploy Allure Report to GitHub Pages
@@ -26,5 +26,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-report
-          publish_branch: gh-pages
+          publish_branch: allure-report
           keep_files: false
