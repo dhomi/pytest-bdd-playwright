@@ -1,6 +1,6 @@
 name: Run tests and publish report
 
-on: [ push ]
+on: [push]
 
 jobs:
   test:
@@ -18,7 +18,10 @@ jobs:
         run: mkdir -p allure-results/history
 
       - name: Copy history
-        run: cp -R ./.github/allure-report/last-history/* allure-results/history/
+        run: |
+          if [ -d "./.github/allure-report/last-history" ]; then
+            cp -R ./.github/allure-report/last-history/* allure-results/history/
+          fi
 
       ## Deploy step
       - name: Deploy Allure Report to GitHub Pages
