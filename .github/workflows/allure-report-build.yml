@@ -1,24 +1,30 @@
 name: Run tests and publish report
 
-on: [push]
+on: [ push ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
-      ## Allure report 
+
+      ## Allure report
       - name: Generate Allure Report
         run: |
-            npm install -g allure-commandline
-            allure generate allure-results -o allure-report --clean
-          
-          ## Deploy step      
+          npm install -g allure-commandline
+          allure generate allure-results -o allure-report --clean
+
+      - name: Make directory history
+        run: mkdir -p allure-results/history
+
+      - name: Copy history
+        run: cp -R ./.github/gh-pages/last-history/* allure-results/history/
+
+      ## Deploy step
       - name: Deploy Allure Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./allure-report
-            publish_branch: gh-pages
-            keep_files: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          publish_branch: gh-pages
+          keep_files: false
