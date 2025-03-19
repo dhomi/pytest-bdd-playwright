@@ -36,7 +36,7 @@ jobs:
           npm install -g allure-commandline
           allure generate allure-results -o allure-report --clean
 
-      - name: Save history for next run
+      - name: Save history for next test run
         run: |
           mkdir -p allure-report/history
           cp -R allure-results/history/* allure-report/history/
