@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: allure-report  # Haal de history op van de allure-report branch
+          fetch-depth: 0  # Haal volledige commit geschiedenis op
 
       - name: Set-up Python
         uses: actions/setup-python@v2
