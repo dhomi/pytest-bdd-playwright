@@ -6,12 +6,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout codebase
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Checkout allure-report branch
+        uses: actions/checkout@v4
+        with:
+          ref: allure-report
+          path: previous-report
+          sparse-checkout: .
+
       - name: Set-up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -20,7 +28,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Clean previous test results
+      - name: Clean previous results
         run: rm -rf allure-results
 
       - name: Run tests
@@ -28,8 +36,10 @@ jobs:
 
       - name: Copy historical data
         run: |
-          if [ -d "allure-report/history" ]; then
-            cp -R allure-report/history/* allure-results/history/
+          mkdir -p allure-results/history
+          # Kopieer historische data van de vorige rapporten
+          if [ -d "previous-report/history" ]; then
+            cp -R previous-report/history/* allure-results/history/
           fi
 
       - name: Generate Allure Report
@@ -37,7 +47,7 @@ jobs:
           npm install -g allure-commandline
           allure generate allure-results -o allure-report --clean
 
-      - name: Preserve history for next run
+      - name: Preserve new history
         run: |
           mkdir -p allure-report/history
           cp -R allure-results/history/* allure-report/history/
@@ -49,3 +59,4 @@ jobs:
           publish_dir: ./allure-report
           publish_branch: allure-report
           keep_files: true
+          force_orphan: false
