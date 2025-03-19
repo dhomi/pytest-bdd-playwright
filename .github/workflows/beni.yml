@@ -10,7 +10,7 @@ on:
 
 jobs:
   generate-allure-report:
-    runs-on: ubuntu-20.04 # Set the operating system for the job
+    runs-on: ubuntu-latest # Set the operating system for the job
 
     defaults:
       run:
