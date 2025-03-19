@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Clean previous results
+      - name: Clean previous test results
         run: rm -rf allure-results
 
       - name: Run tests
