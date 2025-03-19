@@ -170,7 +170,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-allure_results/
+allure-results/
 .idea/
 tmp/
 .DS_Store*
