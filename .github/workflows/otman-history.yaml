@@ -28,7 +28,6 @@ jobs:
 
       - name: Copy historical data
         run: |
-          mkdir -p allure-results/history
           if [ -d "allure-report/history" ]; then
             cp -R allure-report/history/* allure-results/history/
           fi
