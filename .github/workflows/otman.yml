@@ -7,8 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: allure-report
 
       - name: Set up Python
         uses: actions/setup-python@v2
