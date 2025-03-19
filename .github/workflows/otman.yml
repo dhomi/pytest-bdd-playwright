@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: allure-report  # Haal de history op van de allure-report branch
 
       - name: Set-up Python
         uses: actions/setup-python@v2
