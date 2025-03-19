@@ -1,52 +1,45 @@
 name: otmans fix
 
-on: [push]
+on: [ push ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      # Stap 1: Checkout huidige code
       - uses: actions/checkout@v3
 
-      # Stap 2: Checkout allure-report branch om history op te halen
       - name: Checkout allure-report branch
         uses: actions/checkout@v3
         with:
           ref: allure-report
           path: allure-report-history
 
-      # Stap 3: Installeer dependencies en voer tests uit (voorbeeld met npm, pas aan naar jouw testrunner)
       - name: Run tests and generate results
         run: |
           npm install
           npm test # Vervang dit door het commando dat jouw tests uitvoert en allure-results genereert
 
-      # Stap 4: Kopieer history van vorige rapporten naar allure-results/history
       - name: Prepare history directory
         run: |
           mkdir -p allure-results/history
-          # Kopieer history van vorige rapporten (als deze bestaat)
           if [ -d "allure-report-history/history" ]; then
             cp -R allure-report-history/history/* allure-results/history/
           fi
 
-      # Stap 5: Genereer Allure rapport met history
       - name: Generate Allure Report
         run: |
           npm install -g allure-commandline
           allure generate allure-results -o allure-report --clean
 
-      # Stap 6: Bewaar de huidige history voor de volgende run
       - name: Save history for next run
         run: |
           cp -R allure-report/history allure-report/
 
-      # Stap 7: Deploy naar GitHub Pages
       - name: Deploy Allure Report
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-report
           publish_branch: allure-report
-          keep_files: true # Behoud history op de branch
+          keep_files: true 
+          
