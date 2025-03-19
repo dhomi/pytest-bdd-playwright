@@ -34,8 +34,8 @@ jobs:
 
       - name: Copy history
         run: |
-          if [ -d "./.github/allure-report/last-history" ]; then
-            cp -R ./.github/allure-report/last-history/* allure-results/history/
+          if [ -d "./.github/allure-report/history" ]; then
+            cp -R ./.github/allure-report/history/* allure-results/history/
           fi
 
       ## Deploy step
