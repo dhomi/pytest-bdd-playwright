@@ -11,11 +11,11 @@ on:
 jobs:
   generate-allure-report:
     runs-on: ubuntu-latest # Set the operating system for the job
-
-#    defaults:
-#      run:
-#        shell: bash # Set the shell for the job
-#        working-directory: ./tests # Set the working directory for the job
+    
+    #    defaults:
+    #      run:
+    #        shell: bash # Set the shell for the job
+    #        working-directory: ./tests # Set the working directory for the job
 
     steps:
       - name: Checkout repo # Step to check out the repository
@@ -38,8 +38,8 @@ jobs:
 
       - name: Run tests with pytest # Step to run tests using pytest
         run: |
-#          python -m pytest -v --gherkin-terminal-reporter -s --tags="${{ github.event.inputs.tags }}" --color=yes --alluredir=../allure-results
-          pytest --color=yes --alluredir=../allure-results
+          #          python -m pytest -v --gherkin-terminal-reporter -s --tags="${{ github.event.inputs.tags }}" --color=yes --alluredir=../allure-results
+               pytest --color=yes --alluredir=../allure-results
 
       - name: Get Allure history # Step to retrieve Allure history
         uses: actions/checkout@v3
