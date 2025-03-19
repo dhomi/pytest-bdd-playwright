@@ -12,7 +12,7 @@ jobs:
       - name: Generate Allure Report
         run: |
           npm install -g allure-commandline
-          allure generate allure-results -o allure-report 
+          allure generate allure-results -o allure-report --clean
 
       - name: Make directory history
         run: mkdir -p allure-results/history
@@ -30,4 +30,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-report
           publish_branch: allure-report
-          keep_files: false
+          keep_files: true
