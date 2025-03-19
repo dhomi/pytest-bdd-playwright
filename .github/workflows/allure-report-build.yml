@@ -12,7 +12,7 @@ jobs:
       - name: Generate Allure Report
         run: |
           npm install -g allure-commandline
-          allure generate allure-results -o allure-report --clean
+          allure generate allure-results -o allure-report 
 
       - name: Make directory history
         run: mkdir -p allure-results/history
