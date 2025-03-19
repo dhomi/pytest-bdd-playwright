@@ -41,7 +41,7 @@ jobs:
             cp -R previous-report/history/* allure-results/history/ || true
           fi
 
-      - name: Generate Allure Report
+      - name: Generate Allure report
         run: |
           npm install -g allure-commandline
           allure generate allure-results -o allure-report --clean
