@@ -3,7 +3,7 @@ name: Run Python tests and publish report
 on:
   push:
     branches:
-      - master  # Adjust this as necessary for your project
+      - main  # Adjust this as necessary for your project
 
 jobs:
   test:
