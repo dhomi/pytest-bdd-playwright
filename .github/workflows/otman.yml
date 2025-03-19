@@ -1,14 +1,15 @@
 name: otmans fix
 
-on: [ push ]
+on: [push]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: allure-report
 
-      ## Install dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -19,13 +20,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      ## Run tests
       - name: Run tests
         run: pytest
 
       - name: Prepare history directory
         run: |
           mkdir -p allure-results/history
+          # Kopieer history van het vorige rapport
           if [ -d "allure-report/history" ]; then
             cp -R allure-report/history/* allure-results/history/
           fi
@@ -37,7 +38,8 @@ jobs:
 
       - name: Save history for next run
         run: |
-          cp -R allure-results/history allure-report/
+          mkdir -p allure-report/history
+          cp -R allure-results/history/* allure-report/history/
 
       - name: Deploy Allure Report
         uses: peaceiris/actions-gh-pages@v3
@@ -45,5 +47,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-report
           publish_branch: allure-report
-          keep_files: true 
-          
+          keep_files: true
