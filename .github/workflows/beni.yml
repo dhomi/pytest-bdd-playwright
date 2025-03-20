@@ -1,50 +1,57 @@
-name: Beni's tryout
-description: 'Publish Allure report with history to GitHub Pages'
+name: ci
 
 on:
-  workflow_dispatch: # Trigger the workflow manually
-    inputs:
-      tags: # Input parameter for test scenario tags
-        description: "PyTest scenario bdd tags"
-        required: true
-        default: "smoke"
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx playwright install
+      - run: npm test
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 20
+
       - name: Get Allure history
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+        if: always()
         continue-on-error: true
         with:
-          ref: ${{ github.event.inputs.gh-pages-branch }}
+          ref: allure-report
           path: allure-report
 
-      - name: Allure Report Generation
-        uses: telia-actions/simple-elf-allure-report@v1
+      - name: Test marketplace action
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
         with:
-          allure_results: ${{ github.event.inputs.allure-results }}
+          allure_results: allure-results
+          gh_pages: allure-report
+          allure_report: allure-report
           allure_history: allure-history
-          keep_reports: ${{ github.event.inputs.keep-reports }}
-          subfolder: ${{ github.event.inputs.subfolder }}
-          test_env_name: ${{ github.event.inputs.test-env-name }}
+          keep_reports: 20
 
       - name: Deploy report to Github Pages
-        uses: telia-actions/peaceiris-gh-pages@v4
-        with:
-          github_token: ${{ github.event.inputs.gh-token }}
-          publish_branch: ${{ github.event.inputs.gh-pages-branch }}
-          publish_dir: ./allure-history
-
-      - id: report-link
-        run: |
-          if [[ '${{ github.event.inputs.subfolder }}' != '' ]]; then export URL_SUBFOLDER=${{ github.event.inputs.subfolder }}/; fi
-          echo "report-url=$(gh api repos/$GITHUB_REPOSITORY/pages | jq .html_url | sed -e 's/^"//' -e 's/"$//')${URL_SUBFOLDER}${{ github.run_number }}/" >> $GITHUB_OUTPUT
+        if: always()
+        uses: peaceiris/actions-gh-pages@v2
         env:
-          GH_TOKEN: ${{ github.event.inputs.gh-token }}
-        shell: bash
+          PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_BRANCH: allure-report
+          PUBLISH_DIR: allure-history
 
-outputs:
-  report-url:
-    description: "URL for Allure report"
-    value: ${{ steps.report-link.outputs.report-url }}
