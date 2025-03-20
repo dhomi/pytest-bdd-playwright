@@ -1,4 +1,5 @@
 name: Beni's tryout
+description: 'Publish Allure report with history to GitHub Pages'
 
 on:
   workflow_dispatch: # Trigger the workflow manually
@@ -8,59 +9,67 @@ on:
         required: true
         default: "smoke"
 
-jobs:
-  generate-allure-report:
-    runs-on: ubuntu-latest # Set the operating system for the job
-    
-    #    defaults:
-    #      run:
-    #        shell: bash # Set the shell for the job
-    #        working-directory: ./tests # Set the working directory for the job
+inputs:
+  allure-results:
+    description: 'Path to directory having Allure results'
+    required: true
+    default: 'allure-results'
+  gh-pages-branch:
+    description: 'Branch to be used for GitHub Pages'
+    required: true
+    default: 'allure-report'
+  gh-token:
+    description: 'GitHub Token to be used for deploying pages. Use for example secrets.GITHUB_TOKEN as the value.'
+    required: true
+  keep-reports:
+    description: 'Keep x last reports'
+    required: false
+    default: '14'
+  subfolder:
+    description: 'This can be used for example to store reports from test runs in different test environments, or from different test sets, into separate subfolders.'
+    required: false
+    default: ''
+  test-env-name:
+    description: 'Name of the test environment. Will be stored to the report.'
+    required: false
+    default: ''
+outputs:
+  report-url:
+    description: "URL for Allure report"
+    value: ${{ steps.report-link.outputs.report-url }}
 
-    steps:
-      - name: Checkout repo # Step to check out the repository
-        uses: actions/checkout@v3
+runs:
+  using: composite
+  steps:
+    - name: Get Allure history
+      uses: actions/checkout@v3
+      continue-on-error: true
+      with:
+        ref: ${{ inputs.gh-pages-branch }}
+        path: allure-report
 
-      - name: Install Python 3 # Step to install Python 3
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
+    - name: Allure Report Generation
+      uses: telia-actions/simple-elf-allure-report@v1
+      with:
+        allure_results: ${{ inputs.allure-results }}
+        #gh_pages: gh-pages
+        #allure_report: allure-report
+        allure_history: allure-history
+        keep_reports: ${{ inputs.keep-reports }}
+        subfolder: ${{ inputs.subfolder }}
+        test_env_name: ${{ inputs.test-env-name }}
 
-      - name: Install dependencies # Step to install project dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Deploy report to Github Pages
+      uses: telia-actions/peaceiris-gh-pages@v4
+      with:
+        github_token: ${{ inputs.gh-token }}
+        publish_branch: ${{ inputs.gh-pages-branch }}
+        publish_dir: ./allure-history
 
-      - name: Prepare Allure history # Step to prepare Allure history directory
-        run: |
-          cd ..
-          mkdir -p allure-results
-
-      - name: Run tests with pytest # Step to run tests using pytest
-        run: |
-          #          python -m pytest -v --gherkin-terminal-reporter -s --tags="${{ github.event.inputs.tags }}" --color=yes --alluredir=../allure-results
-               pytest --color=yes --alluredir=../allure-results
-
-      - name: Get Allure history # Step to retrieve Allure history
-        uses: actions/checkout@v3
-        if: always() # Execute even if previous steps fail
-        continue-on-error: true # Continue execution even if the step fails
-        with:
-          ref: allure-report # Specify the branch to retrieve Allure history from
-          path: allure-report # Set the destination path for Allure history
-
-      - name: Allure report action # Step to generate Allure report
-        uses: simple-elf/allure-report-action@master
-        if: always() # Execute even if previous steps fail
-        with:
-          allure_results: allure-results # Specify the directory containing Allure results
-          allure_history: allure-history # Specify the directory to store Allure history
-          keep_reports: 5 # Specify the number of previous reports to keep
-
-      - name: Deploy Allure report to GitHub Pages # Step to deploy Allure report to GitHub Pages
-        if: always() # Execute even if previous steps fail
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # Provide the GitHub token for authentication
-          publish_branch: allure-report # Specify the branch to publish the report to
-          publish_dir: allure-history # Specify the directory containing the report
+    - id: report-link
+      run: |
+        if [[ '${{ inputs.subfolder }}' != '' ]]; then export URL_SUBFOLDER=${{ inputs.subfolder }}/; fi
+        echo "report-url=$(gh api repos/$GITHUB_REPOSITORY/pages | jq .html_url | sed -e 's/^"//' -e 's/"$//')${URL_SUBFOLDER}${{ github.run_number }}/" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ inputs.gh-token }}
+      shell: bash
