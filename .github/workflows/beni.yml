@@ -44,7 +44,7 @@ jobs:
           GH_TOKEN: ${{ github.event.inputs.gh-token }}
         shell: bash
 
-    outputs:
-      report-url:
-        description: "URL for Allure report"
-        value: ${{ steps.report-link.outputs.report-url }}
+outputs:
+  report-url:
+    description: "URL for Allure report"
+    value: ${{ steps.report-link.outputs.report-url }}
