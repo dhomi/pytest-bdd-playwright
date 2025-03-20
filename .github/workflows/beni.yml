@@ -38,38 +38,37 @@ outputs:
     description: "URL for Allure report"
     value: ${{ steps.report-link.outputs.report-url }}
 
-runs:
-  using: composite
-  steps:
-    - name: Get Allure history
-      uses: actions/checkout@v3
-      continue-on-error: true
-      with:
-        ref: ${{ inputs.gh-pages-branch }}
-        path: allure-report
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Allure history
+        uses: actions/checkout@v3
+        continue-on-error: true
+        with:
+          ref: ${{ inputs.gh-pages-branch }}
+          path: allure-report
 
-    - name: Allure Report Generation
-      uses: telia-actions/simple-elf-allure-report@v1
-      with:
-        allure_results: ${{ inputs.allure-results }}
-        #gh_pages: gh-pages
-        #allure_report: allure-report
-        allure_history: allure-history
-        keep_reports: ${{ inputs.keep-reports }}
-        subfolder: ${{ inputs.subfolder }}
-        test_env_name: ${{ inputs.test-env-name }}
+      - name: Allure Report Generation
+        uses: telia-actions/simple-elf-allure-report@v1
+        with:
+          allure_results: ${{ inputs.allure-results }}
+          allure_history: allure-history
+          keep_reports: ${{ inputs.keep-reports }}
+          subfolder: ${{ inputs.subfolder }}
+          test_env_name: ${{ inputs.test-env-name }}
 
-    - name: Deploy report to Github Pages
-      uses: telia-actions/peaceiris-gh-pages@v4
-      with:
-        github_token: ${{ inputs.gh-token }}
-        publish_branch: ${{ inputs.gh-pages-branch }}
-        publish_dir: ./allure-history
+      - name: Deploy report to Github Pages
+        uses: telia-actions/peaceiris-gh-pages@v4
+        with:
+          github_token: ${{ inputs.gh-token }}
+          publish_branch: ${{ inputs.gh-pages-branch }}
+          publish_dir: ./allure-history
 
-    - id: report-link
-      run: |
-        if [[ '${{ inputs.subfolder }}' != '' ]]; then export URL_SUBFOLDER=${{ inputs.subfolder }}/; fi
-        echo "report-url=$(gh api repos/$GITHUB_REPOSITORY/pages | jq .html_url | sed -e 's/^"//' -e 's/"$//')${URL_SUBFOLDER}${{ github.run_number }}/" >> $GITHUB_OUTPUT
-      env:
-        GH_TOKEN: ${{ inputs.gh-token }}
-      shell: bash
+      - id: report-link
+        run: |
+          if [[ '${{ inputs.subfolder }}' != '' ]]; then export URL_SUBFOLDER=${{ inputs.subfolder }}/; fi
+          echo "report-url=$(gh api repos/$GITHUB_REPOSITORY/pages | jq .html_url | sed -e 's/^"//' -e 's/"$//')${URL_SUBFOLDER}${{ github.run_number }}/" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ inputs.gh-token }}
+        shell: bash
