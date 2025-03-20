@@ -9,35 +9,6 @@ on:
         required: true
         default: "smoke"
 
-inputs:
-  allure-results:
-    description: 'Path to directory having Allure results'
-    required: true
-    default: 'allure-results'
-  gh-pages-branch:
-    description: 'Branch to be used for GitHub Pages'
-    required: true
-    default: 'allure-report'
-  gh-token:
-    description: 'GitHub Token to be used for deploying pages. Use for example secrets.GITHUB_TOKEN as the value.'
-    required: true
-  keep-reports:
-    description: 'Keep x last reports'
-    required: false
-    default: '14'
-  subfolder:
-    description: 'This can be used for example to store reports from test runs in different test environments, or from different test sets, into separate subfolders.'
-    required: false
-    default: ''
-  test-env-name:
-    description: 'Name of the test environment. Will be stored to the report.'
-    required: false
-    default: ''
-outputs:
-  report-url:
-    description: "URL for Allure report"
-    value: ${{ steps.report-link.outputs.report-url }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -46,29 +17,34 @@ jobs:
         uses: actions/checkout@v3
         continue-on-error: true
         with:
-          ref: ${{ inputs.gh-pages-branch }}
+          ref: ${{ github.event.inputs.gh-pages-branch }}
           path: allure-report
 
       - name: Allure Report Generation
         uses: telia-actions/simple-elf-allure-report@v1
         with:
-          allure_results: ${{ inputs.allure-results }}
+          allure_results: ${{ github.event.inputs.allure-results }}
           allure_history: allure-history
-          keep_reports: ${{ inputs.keep-reports }}
-          subfolder: ${{ inputs.subfolder }}
-          test_env_name: ${{ inputs.test-env-name }}
+          keep_reports: ${{ github.event.inputs.keep-reports }}
+          subfolder: ${{ github.event.inputs.subfolder }}
+          test_env_name: ${{ github.event.inputs.test-env-name }}
 
       - name: Deploy report to Github Pages
         uses: telia-actions/peaceiris-gh-pages@v4
         with:
-          github_token: ${{ inputs.gh-token }}
-          publish_branch: ${{ inputs.gh-pages-branch }}
+          github_token: ${{ github.event.inputs.gh-token }}
+          publish_branch: ${{ github.event.inputs.gh-pages-branch }}
           publish_dir: ./allure-history
 
       - id: report-link
         run: |
-          if [[ '${{ inputs.subfolder }}' != '' ]]; then export URL_SUBFOLDER=${{ inputs.subfolder }}/; fi
+          if [[ '${{ github.event.inputs.subfolder }}' != '' ]]; then export URL_SUBFOLDER=${{ github.event.inputs.subfolder }}/; fi
           echo "report-url=$(gh api repos/$GITHUB_REPOSITORY/pages | jq .html_url | sed -e 's/^"//' -e 's/"$//')${URL_SUBFOLDER}${{ github.run_number }}/" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{ inputs.gh-token }}
+          GH_TOKEN: ${{ github.event.inputs.gh-token }}
         shell: bash
+
+    outputs:
+      report-url:
+        description: "URL for Allure report"
+        value: ${{ steps.report-link.outputs.report-url }}
